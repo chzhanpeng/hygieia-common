@@ -147,27 +147,27 @@ public class RallyFeature extends BaseModel {
 	}
 
 	public String getInstanceUrl() {
-		return (String) options.get(INSTANCE_URL);
+		return (String) getOptions().get(INSTANCE_URL);
 	}
 
 	public void setInstanceUrl(String instanceUrl) {
-		options.put(INSTANCE_URL, instanceUrl);
+		getOptions().put(INSTANCE_URL, instanceUrl);
 	}
 
 	public String getIterationId() {
-		return (String) options.get(ITERATION_ID);
+		return (String) getOptions().get(ITERATION_ID);
 	}
 
 	public void setIterationId(String id) {
-		options.put(ITERATION_ID, id);
+		getOptions().put(ITERATION_ID, id);
 	}
 
 	public String getIterationName() {
-		return (String) options.get(ITERATION_NAME);
+		return (String) getOptions().get(ITERATION_NAME);
 	}
 
 	public void setIterationName(String name) {
-		options.put(ITERATION_NAME, name);
+		getOptions().put(ITERATION_NAME, name);
 	}
 
 	public long getTimestamp() {

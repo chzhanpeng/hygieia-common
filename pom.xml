@@ -101,16 +101,16 @@
                         <excludeRoot>${project.basedir}/target/generated-sources/java</excludeRoot>
                     </excludeRoots>
                     <rulesets>
-                        <ruleset>${project.basedir}/pmd.xml</ruleset>
+                        <ruleset>${project.basedir}/src/devops/pmd.xml</ruleset>
                     </rulesets>
                 </configuration>
                 <executions>
                     <execution>
                         <phase>validate</phase>
                         <goals>
-                            <goal>check</goal>
                             <!-- disabled for now: -->
-                            <!--<goal>cpd-check</goal>-->
+                            <!-- <goal>check</goal> -->
+                            <!-- <goal>cpd-check</goal> -->
                         </goals>
                     </execution>
                 </executions>

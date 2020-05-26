@@ -16,6 +16,7 @@ import com.capitalone.dashboard.repository.CollectorItemRepository;
 import com.capitalone.dashboard.repository.CollectorRepository;
 import com.capitalone.dashboard.repository.ComponentRepository;
 import com.capitalone.dashboard.repository.DashboardRepository;
+import com.capitalone.dashboard.repository.FeatureFlagRepository;
 import com.capitalone.dashboard.repository.LibraryPolicyResultsRepository;
 import com.capitalone.dashboard.repository.RelatedCollectorItemRepository;
 import com.capitalone.dashboard.repository.TestResultRepository;
@@ -71,10 +72,12 @@ public class SyncDashboardTest {
     @Autowired
     private RelatedCollectorItemRepository relatedCollectorItemRepository;
 
+    @Autowired
+    private FeatureFlagRepository featureFlagRepository;
 
     @Bean
     private SyncDashboard syncDashboard() {
-        return new SyncDashboard(dashboardRepository, componentRepository, collectorRepository, collectorItemRepository, buildRepository, relatedCollectorItemRepository, codeQualityRepository);
+        return new SyncDashboard(dashboardRepository, componentRepository, collectorRepository, collectorItemRepository, buildRepository, relatedCollectorItemRepository, codeQualityRepository,featureFlagRepository);
     }
 
 
@@ -95,14 +98,14 @@ public class SyncDashboardTest {
 
     @Test
     public void getWidget() {
-        Widget w = SyncDashboard.getWidget("repo", dashboardRepository.findAll().iterator().next());
+        Widget w = syncDashboard().getWidget("repo", dashboardRepository.findAll().iterator().next());
         assertNotEquals(w.getOptions(), null);
         assertEquals(w.getOptions().get("url"), "https://mygithub.com/myOrg/myRepo");
 
-        w = SyncDashboard.getWidget("codeanalysis", dashboardRepository.findAll().iterator().next());
+        w = syncDashboard().getWidget("codeanalysis", dashboardRepository.findAll().iterator().next());
         assertNotEquals(w.getOptions(), null);
 
-        w = SyncDashboard.getWidget("dummy", dashboardRepository.findAll().iterator().next());
+        w = syncDashboard().getWidget("dummy", dashboardRepository.findAll().iterator().next());
         assertEquals(w, null);
     }
 
@@ -190,7 +193,7 @@ public class SyncDashboardTest {
         relatedCollectorItemRepository.deleteAll();
         CodeQuality codeQuality = codeQualityRepository.findOne(new ObjectId("5ba98d055de4b1195307bf5a"));
         Dashboard testSubject = dashboardRepository.findOne(new ObjectId("5baa458b0be2d337e3885815"));
-        Widget widget = SyncDashboard.getWidget("codeanalysis", testSubject);
+        Widget widget = syncDashboard().getWidget("codeanalysis", testSubject);
         assertTrue(widget == null);
 
         Build build = buildRepository.findOne(new ObjectId("5ba520c40be2d3f98f795054"));
@@ -201,13 +204,13 @@ public class SyncDashboardTest {
 
         relatedCollectorItemRepository.findAll().forEach( r -> {
             try {
-                syncDashboard().sync(r);
+                syncDashboard().sync(r,true);
             } catch (SyncException e) {
             }
         });
 
         testSubject = dashboardRepository.findOne(new ObjectId("5baa458b0be2d337e3885815"));
-        widget = SyncDashboard.getWidget("codeanalysis", testSubject);
+        widget = syncDashboard().getWidget("codeanalysis", testSubject);
         assertTrue(widget != null);
 
         Component component = componentRepository.findOne(widget.getComponentId());

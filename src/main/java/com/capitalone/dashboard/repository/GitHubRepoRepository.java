@@ -13,4 +13,11 @@ public interface GitHubRepoRepository extends BaseCollectorItemRepository<GitHub
     default List<GitHubRepo> findEnabledGitHubRepos(ObjectId collectorId) {
         return findAll("collectorId eq " + quote(collectorId) + " and enabled isTrue");
     }
+
+    //TODO: need to verify this query
+    //@Query(value="{ 'collectorId' : ?0, options.url : {$regex : '^?1$', $options: 'i'}, options.branch : {$regex : '^?2$', $options: 'i'}}")
+    default List<GitHubRepo> findRepoByUrlAndBranch(ObjectId collectorId, String repo, String branch) {
+        return findAll( "collectorId eq " + quote(collectorId) + " and options.repo equalsIgnoreCase " + quote(repo) +
+                " and options.branch equalsIgnoreCase " + quote(branch));
+    }
 }

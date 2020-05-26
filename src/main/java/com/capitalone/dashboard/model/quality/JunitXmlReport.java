@@ -127,7 +127,7 @@ import java.util.List;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "testsuite")
-public class JunitXmlReport implements CodeQualityVisitee {
+public class JunitXmlReport implements QualityVisitee {
 
     @XmlElement(required = true)
     protected JunitXmlReport.Properties properties;
@@ -152,6 +152,11 @@ public class JunitXmlReport implements CodeQualityVisitee {
     protected int errors;
     @XmlAttribute(name = "time", required = true)
     protected BigDecimal time;
+    @XmlAttribute(name = "skipped")
+    protected String skipped;
+
+    @XmlAttribute(name = "skips")
+    protected String skips;
 
     /**
      * Gets the value of the properties property.
@@ -362,8 +367,24 @@ public class JunitXmlReport implements CodeQualityVisitee {
         this.time = value;
     }
 
+    public String getSkipped() {
+        return skipped;
+    }
+
+    public void setSkipped(String skipped) {
+        this.skipped = skipped;
+    }
+
+    public String getSkips() {
+        return skips;
+    }
+
+    public void setSkips(String skips) {
+        this.skips = skips;
+    }
+
     @Override
-    public void accept(CodeQualityVisitor visitor) {
+    public void accept(QualityVisitor visitor) {
         visitor.visit(this);
     }
 
@@ -427,7 +448,7 @@ public class JunitXmlReport implements CodeQualityVisitee {
          */
         public List<Property> getProperty() {
             if (property == null) {
-                property = new ArrayList<>();
+                property = new ArrayList<Property>();
             }
             return this.property;
         }
@@ -563,6 +584,8 @@ public class JunitXmlReport implements CodeQualityVisitee {
         protected String classname;
         @XmlAttribute(name = "time", required = true)
         protected BigDecimal time;
+        @XmlAttribute(name = "skipped", required = true)
+        protected String skipped;
 
         /**
          * Gets the value of the error property.
@@ -662,6 +685,15 @@ public class JunitXmlReport implements CodeQualityVisitee {
          */
         public void setTime(BigDecimal value) {
             this.time = value;
+        }
+
+
+        public String getSkipped() {
+            return skipped;
+        }
+
+        public void setSkipped(String skipped) {
+            this.skipped = skipped;
         }
 
         /**

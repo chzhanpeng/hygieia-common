@@ -16,6 +16,8 @@
 
 package com.capitalone.dashboard.model;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -101,6 +103,7 @@ public class Feature extends BaseModel {
 	private String sEpicName;
 	private String sEpicUrl;
 	private String sEpicNumber;
+	@Indexed
 	private String sEpicID;
 
 	/*
@@ -113,6 +116,7 @@ public class Feature extends BaseModel {
 	private String sProjectEndDate;
 	private String sProjectBeginDate;
 	private String sProjectName;
+	@Indexed
 	private String sProjectID;
 
 
@@ -533,22 +537,21 @@ public class Feature extends BaseModel {
 	public void setIssueLinks(Collection<FeatureIssueLink> issueLinks) {
 		this.issueLinks = issueLinks;
 	}
-
+	
 	@Override
 	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (!(o instanceof Feature)) return false;
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
 
-		Feature feature = (Feature) o;
-
-		if (!collectorId.equals(feature.collectorId)) return false;
-		return sId.equals(feature.sId);
+		Feature that = (Feature) o;
+		EqualsBuilder builder = new EqualsBuilder();
+		return builder.append(collectorId, that.collectorId).append(sId, that.sId).build();
 	}
 
 	@Override
 	public int hashCode() {
-		int result = collectorId.hashCode();
-		result = 31 * result + sId.hashCode();
-		return result;
+		return new HashCodeBuilder(17, 37).append(collectorId).append(sId).toHashCode();
 	}
 }

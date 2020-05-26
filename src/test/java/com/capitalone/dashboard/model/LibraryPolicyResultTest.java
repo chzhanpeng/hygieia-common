@@ -14,7 +14,7 @@ public class LibraryPolicyResultTest {
     @Test
     public void addThreat() {
         LibraryPolicyResult result = new LibraryPolicyResult();
-        result.addThreat(LibraryPolicyType.License, LibraryPolicyThreatLevel.Critical, LibraryPolicyThreatDisposition.Open, "component1");
+        result.addThreat(LibraryPolicyType.License, LibraryPolicyThreatLevel.Critical, LibraryPolicyThreatDisposition.Open, "Open:Review Requested", "component1","0","7");
 
         assertEquals(result.getThreats().size(), 1);
         assertEquals(result.getThreats().keySet().size(), 1);
@@ -24,12 +24,12 @@ public class LibraryPolicyResultTest {
         LibraryPolicyResult.Threat threat = threats.iterator().next();
         assertEquals(threat.getCount(), 1);
         assertEquals(threat.getLevel(), LibraryPolicyThreatLevel.Critical);
-        assertEquals(threat.getComponents().iterator().next(), "component1##Open");
+        assertEquals(threat.getComponents().iterator().next(), "component1##Open##0##Open:Review Requested##7");
         assertEquals(threat.getDispositionCounts().size(), 1);
         assertEquals(threat.getDispositionCounts().get(LibraryPolicyThreatDisposition.Open).intValue(), 1);
 
 
-        result.addThreat(LibraryPolicyType.License, LibraryPolicyThreatLevel.Critical, LibraryPolicyThreatDisposition.Open, "component2");
+        result.addThreat(LibraryPolicyType.License, LibraryPolicyThreatLevel.Critical, LibraryPolicyThreatDisposition.Open, "Open", "component2","0","7");
         assertEquals(result.getThreats().size(), 1);
         assertEquals(result.getThreats().keySet().size(), 1);
         assertEquals(result.getThreats().values().size(), 1);
@@ -39,13 +39,13 @@ public class LibraryPolicyResultTest {
         threat = threats.iterator().next();
         assertEquals(threat.getCount(), 2);
         assertEquals(threat.getLevel(), LibraryPolicyThreatLevel.Critical);
-        assertTrue(threat.getComponents().contains( "component1##Open"));
-        assertTrue(threat.getComponents().contains( "component2##Open"));
+        assertTrue(threat.getComponents().contains( "component1##Open##0##Open:Review Requested##7"));
+        assertTrue(threat.getComponents().contains( "component2##Open##0##Open##7"));
         assertEquals(threat.getDispositionCounts().size(), 1);
         assertEquals(threat.getDispositionCounts().get(LibraryPolicyThreatDisposition.Open).intValue(), 2);
 
 
-        result.addThreat(LibraryPolicyType.License, LibraryPolicyThreatLevel.Critical, LibraryPolicyThreatDisposition.Closed, "component3");
+        result.addThreat(LibraryPolicyType.License, LibraryPolicyThreatLevel.Critical, LibraryPolicyThreatDisposition.Closed, "Closed:False Positive", "component3","0","7");
         assertEquals(result.getThreats().size(), 1);
         assertEquals(result.getThreats().keySet().size(), 1);
         assertEquals(result.getThreats().values().size(), 1);
@@ -55,14 +55,14 @@ public class LibraryPolicyResultTest {
         threat = threats.iterator().next();
         assertEquals(threat.getCount(), 3);
         assertEquals(threat.getLevel(), LibraryPolicyThreatLevel.Critical);
-        assertTrue(threat.getComponents().contains( "component1##Open"));
-        assertTrue(threat.getComponents().contains( "component2##Open"));
-        assertTrue(threat.getComponents().contains( "component3##Closed"));
+        assertTrue(threat.getComponents().contains( "component1##Open##0##Open:Review Requested##7"));
+        assertTrue(threat.getComponents().contains( "component2##Open##0##Open##7"));
+        assertTrue(threat.getComponents().contains( "component3##Closed##0##Closed:False Positive##7"));
         assertEquals(threat.getDispositionCounts().size(), 2);
         assertEquals(threat.getDispositionCounts().get(LibraryPolicyThreatDisposition.Open).intValue(), 2);
         assertEquals(threat.getDispositionCounts().get(LibraryPolicyThreatDisposition.Closed).intValue(), 1);
 
-        result.addThreat(LibraryPolicyType.License, LibraryPolicyThreatLevel.High, LibraryPolicyThreatDisposition.Open, "component4");
+        result.addThreat(LibraryPolicyType.License, LibraryPolicyThreatLevel.High, LibraryPolicyThreatDisposition.Open, "Open:Legal Review Requested", "component4","0","7");
         assertEquals(result.getThreats().size(), 1);
         assertEquals(result.getThreats().keySet().size(), 1);
         assertEquals(result.getThreats().values().size(), 1);
@@ -75,9 +75,9 @@ public class LibraryPolicyResultTest {
         assertNotNull(threat);
         assertEquals(threat.getCount(), 3);
         assertEquals(threat.getLevel(), LibraryPolicyThreatLevel.Critical);
-        assertTrue(threat.getComponents().contains( "component1##Open"));
-        assertTrue(threat.getComponents().contains( "component2##Open"));
-        assertTrue(threat.getComponents().contains( "component3##Closed"));
+        assertTrue(threat.getComponents().contains( "component1##Open##0##Open:Review Requested##7"));
+        assertTrue(threat.getComponents().contains( "component2##Open##0##Open##7"));
+        assertTrue(threat.getComponents().contains( "component3##Closed##0##Closed:False Positive##7"));
         assertEquals(threat.getDispositionCounts().size(), 2);
         assertEquals(threat.getDispositionCounts().get(LibraryPolicyThreatDisposition.Open).intValue(), 2);
         assertEquals(threat.getDispositionCounts().get(LibraryPolicyThreatDisposition.Closed).intValue(), 1);
@@ -85,12 +85,12 @@ public class LibraryPolicyResultTest {
         assertNotNull(threat);
         assertEquals(threat.getCount(), 1);
         assertEquals(threat.getLevel(), LibraryPolicyThreatLevel.High);
-        assertTrue(threat.getComponents().contains( "component4##Open"));
+        assertTrue(threat.getComponents().contains( "component4##Open##0##Open:Legal Review Requested##7"));
         assertEquals(threat.getDispositionCounts().size(), 1);
         assertEquals(threat.getDispositionCounts().get(LibraryPolicyThreatDisposition.Open).intValue(), 1);
 
 
-        result.addThreat(LibraryPolicyType.Security, LibraryPolicyThreatLevel.High, LibraryPolicyThreatDisposition.Open, "component5");
+        result.addThreat(LibraryPolicyType.Security, LibraryPolicyThreatLevel.High, LibraryPolicyThreatDisposition.Open, "Open:Unconfirmed", "component5","0","7");
         assertEquals(result.getThreats().size(), 2);
         assertEquals(result.getThreats().keySet().size(), 2);
         assertEquals(result.getThreats().values().size(), 2);
@@ -102,9 +102,9 @@ public class LibraryPolicyResultTest {
         assertNotNull(threat);
         assertEquals(threat.getCount(), 3);
         assertEquals(threat.getLevel(), LibraryPolicyThreatLevel.Critical);
-        assertTrue(threat.getComponents().contains( "component1##Open"));
-        assertTrue(threat.getComponents().contains( "component2##Open"));
-        assertTrue(threat.getComponents().contains( "component3##Closed"));
+        assertTrue(threat.getComponents().contains( "component1##Open##0##Open:Review Requested##7"));
+        assertTrue(threat.getComponents().contains( "component2##Open##0##Open##7"));
+        assertTrue(threat.getComponents().contains( "component3##Closed##0##Closed:False Positive##7"));
         assertEquals(threat.getDispositionCounts().size(), 2);
         assertEquals(threat.getDispositionCounts().get(LibraryPolicyThreatDisposition.Open).intValue(), 2);
         assertEquals(threat.getDispositionCounts().get(LibraryPolicyThreatDisposition.Closed).intValue(), 1);
@@ -112,7 +112,7 @@ public class LibraryPolicyResultTest {
         assertNotNull(threat);
         assertEquals(threat.getCount(), 1);
         assertEquals(threat.getLevel(), LibraryPolicyThreatLevel.High);
-        assertTrue(threat.getComponents().contains( "component4##Open"));
+        assertTrue(threat.getComponents().contains( "component4##Open##0##Open:Legal Review Requested##7"));
         assertEquals(threat.getDispositionCounts().size(), 1);
         assertEquals(threat.getDispositionCounts().get(LibraryPolicyThreatDisposition.Open).intValue(), 1);
 
@@ -122,7 +122,7 @@ public class LibraryPolicyResultTest {
         assertNotNull(threat);
         assertEquals(threat.getCount(), 1);
         assertEquals(threat.getLevel(), LibraryPolicyThreatLevel.High);
-        assertTrue(threat.getComponents().contains( "component5##Open"));
+        assertTrue(threat.getComponents().contains( "component5##Open##0##Open:Unconfirmed##7"));
         assertEquals(threat.getDispositionCounts().size(), 1);
     }
 

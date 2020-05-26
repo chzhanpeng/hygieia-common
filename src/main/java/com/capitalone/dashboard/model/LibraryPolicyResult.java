@@ -1,6 +1,7 @@
 package com.capitalone.dashboard.model;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -23,17 +24,25 @@ public class LibraryPolicyResult extends BaseModel {
     private Integer totalComponentCount;
     private Integer knownComponentCount;
     private List<PolicyScanMetric> policyAlert = new ArrayList<>();
+    private ObjectId buildId;
+    private String scanState;
 
     public static class Threat {
         LibraryPolicyThreatLevel level;
         List<String> components = new ArrayList<>();
         int count;
         private Map<LibraryPolicyThreatDisposition, Integer> dispositionCounts = new HashMap<>();
+        int maxAge;
+        double maxScore;
 
         public Threat(LibraryPolicyThreatLevel level, int count) {
             this.level = level;
             this.count = count;
         }
+
+
+
+
 
         public LibraryPolicyThreatLevel getLevel() {
             return level;
@@ -61,6 +70,22 @@ public class LibraryPolicyResult extends BaseModel {
 
         public void addDispositionCount(LibraryPolicyThreatDisposition disposition) {
             dispositionCounts.merge(disposition, 1, (a, b) -> a + b);
+        }
+
+        public int getMaxAge() {
+            return maxAge;
+        }
+
+        public void setMaxAge(int maxAge) {
+            this.maxAge = maxAge;
+        }
+
+        public double getMaxScore() {
+            return maxScore;
+        }
+
+        public void setMaxScore(double maxScore) {
+            this.maxScore = maxScore;
         }
 
         public Map<LibraryPolicyThreatDisposition, Integer> getDispositionCounts() {
@@ -129,13 +154,15 @@ public class LibraryPolicyResult extends BaseModel {
         }
     }
 
-    public void addThreat(LibraryPolicyType type, LibraryPolicyThreatLevel level, LibraryPolicyThreatDisposition disposition, String component) {
+    public void addThreat(LibraryPolicyType type, LibraryPolicyThreatLevel level, LibraryPolicyThreatDisposition disposition, String dispositionStatus, String component,String age,String score) {
         Set<Threat> threatSet = threats.get(type);
 
         if (CollectionUtils.isEmpty(threatSet)) {
             Threat threat = new Threat(level, 1);
-            threat.getComponents().add(getComponentPlusDisposition(component,disposition));
+            threat.getComponents().add(getComponentPlusDispositionPlusAge(component,disposition,dispositionStatus,age,score));
             threat.addDispositionCount(disposition);
+            setCriticalAndHighVulAge(age, threat,disposition);
+            setCriticalAndHighVulScore(score,threat,disposition);
             Set<Threat> set = new HashSet<>();
             set.add(threat);
             threats.put(type, set);
@@ -145,8 +172,10 @@ public class LibraryPolicyResult extends BaseModel {
                 if (Objects.equals(t.getLevel(), level)) {
                     t.setCount(t.getCount() + 1);
                     t.addDispositionCount(disposition);
-                    if (!t.getComponents().contains(getComponentPlusDisposition(component,disposition))) {
-                        t.getComponents().add(getComponentPlusDisposition(component,disposition));
+                    setCriticalAndHighVulAge(age, t,disposition);
+                    setCriticalAndHighVulScore(score,t,disposition);
+                    if (!t.getComponents().contains(getComponentPlusDispositionPlusAge(component,disposition,dispositionStatus,age,score))) {
+                        t.getComponents().add(getComponentPlusDispositionPlusAge(component,disposition,dispositionStatus,age,score));
                     }
                     threatSet.add(t);
                     threats.put(type, threatSet);
@@ -156,15 +185,31 @@ public class LibraryPolicyResult extends BaseModel {
             }
             if (!found) {
                 Threat t = new Threat(level, 1);
-                if (!t.getComponents().contains(getComponentPlusDisposition(component,disposition))) {
-                    t.getComponents().add(getComponentPlusDisposition(component,disposition));
+                if (!t.getComponents().contains(getComponentPlusDispositionPlusAge(component,disposition,dispositionStatus,age,score))) {
+                    t.getComponents().add(getComponentPlusDispositionPlusAge(component,disposition,dispositionStatus,age,score));
                 }
                 t.addDispositionCount(disposition);
+                setCriticalAndHighVulAge(age, t,disposition);
+                setCriticalAndHighVulScore(score,t,disposition);
                 threatSet.add(t);
                 threats.put(type, threatSet);
             }
         }
 
+    }
+
+    private void setCriticalAndHighVulAge(String age, Threat threat, LibraryPolicyThreatDisposition disposition) {
+        if (disposition.equals(LibraryPolicyThreatDisposition.Open)) {
+            int currentValue = NumberUtils.toInt(age);
+            threat.setMaxAge(threat.getMaxAge() <= currentValue ? currentValue : threat.getMaxAge());
+        }
+    }
+
+    private void setCriticalAndHighVulScore(String score, Threat threat, LibraryPolicyThreatDisposition disposition) {
+        if (disposition.equals(LibraryPolicyThreatDisposition.Open)) {
+            double currentScore = Double.parseDouble(score);
+            threat.setMaxScore(threat.getMaxScore() <= currentScore ? currentScore : threat.getMaxScore());
+        }
     }
 
     public void setThreats(Map<LibraryPolicyType, Set<Threat>> threats) {
@@ -211,8 +256,22 @@ public class LibraryPolicyResult extends BaseModel {
         this.policyAlert = policyAlert;
     }
 
-    private static String getComponentPlusDisposition(String component, LibraryPolicyThreatDisposition disposition) {
+    private String getComponentPlusDisposition (String component, LibraryPolicyThreatDisposition disposition) {
         return String.format("%s##%s", component, disposition.toString());
     }
+
+    private String getComponentPlusDispositionPlusAge (String component, LibraryPolicyThreatDisposition disposition, String dispositionStatus,String age, String score) {
+        return String.format("%s##%s##%s##%s##%s", component, disposition.toString(), age, dispositionStatus,score);
+    }
+
+
+    public ObjectId getBuildId() { return buildId; }
+
+    public void setBuildId(ObjectId buildId) { this.buildId = buildId; }
+
+    public void setScanState(String scanState) { this.scanState = scanState; }
+
+    public String getScanState() { return this.scanState; }
+
 
 }

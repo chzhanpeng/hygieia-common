@@ -28,4 +28,6 @@ public interface ScopeRepository extends QueryRepository<Scope> {
 	List<Scope> findByCollectorId(ObjectId collectorId);
 
 	Page<Scope> findAllByCollectorIdAndNameContainingIgnoreCase(ObjectId collectorId, String name, Pageable pageable);
+
+	Scope findByCollectorIdAndPId(ObjectId collectorId, String pId);
 }

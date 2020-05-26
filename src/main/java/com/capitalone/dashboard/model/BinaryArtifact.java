@@ -3,9 +3,12 @@ package com.capitalone.dashboard.model;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Binary artifacts produced by build jobs and stored in an artifact repository.
@@ -18,7 +21,6 @@ import java.util.Map;
  *  rubygems
  *
  */
-@SuppressWarnings({"PMD.VariableNamingConventions","PMD.MethodNamingConventions"})
 @Document(collection = "artifacts")
 public class BinaryArtifact extends BaseModel {
 	
@@ -48,29 +50,23 @@ public class BinaryArtifact extends BaseModel {
     private String artifactClassifier;
     private String artifactExtension;
     private String type;
-    private String createdTimeStamp;
+    private long createdTimeStamp;
 
 
     private String createdBy;
-    private String modifiedTimeStamp;
+    private long modifiedTimeStamp;
     private String modifiedBy;
     private String actual_sha1;
     private String actual_md5;
+    private String authorLDAPDN;
 
 
-    
-    private Build buildInfo;
+    private List<Build> buildInfos = new ArrayList<>();
+      private List<String> virtualRepos;
     
     private Map<String, String> metadata = new HashMap<>();
     
-    // Note this can be null 
-    public Build getBuildInfo() {
-    	return buildInfo;
-    }
-    
-    public void setBuildInfo(Build buildInfo) {
-    	this.buildInfo = buildInfo;
-    }
+
 
     public ObjectId getCollectorItemId() {
         return collectorItemId;
@@ -163,67 +159,67 @@ public class BinaryArtifact extends BaseModel {
 	}
     
     public String getBuildUrl() {
-    	return metadata.get(METADATA_BUILD_URL);
+    	return getMetadata().get(METADATA_BUILD_URL);
     }
     
     public void setBuildUrl(String buildUrl) {
-    	metadata.put(METADATA_BUILD_URL, buildUrl);
+    	getMetadata().put(METADATA_BUILD_URL, buildUrl);
     }
     
     public String getBuildNumber() {
-    	return metadata.get(METADATA_BUILD_NUMBER);
+    	return getMetadata().get(METADATA_BUILD_NUMBER);
     }
     
     public void setBuildNumber(String buildNumber) {
-    	metadata.put(METADATA_BUILD_NUMBER, buildNumber);
+    	getMetadata().put(METADATA_BUILD_NUMBER, buildNumber);
     }
     
     public String getJobUrl() {
-    	return metadata.get(METADATA_JOB_URL);
+    	return getMetadata().get(METADATA_JOB_URL);
     }
     
     public void setJobUrl(String jobUrl) {
-    	metadata.put(METADATA_JOB_URL, jobUrl);
+    	getMetadata().put(METADATA_JOB_URL, jobUrl);
     }
     
     public String getJobName() {
-    	return metadata.get(METADATA_JOB_NAME);
+    	return getMetadata().get(METADATA_JOB_NAME);
     }
     
     public void setJobName(String jobName) {
-    	metadata.put(METADATA_JOB_NAME, jobName);
+    	getMetadata().put(METADATA_JOB_NAME, jobName);
     }
     
     public String getInstanceUrl() {
-    	return metadata.get(METADATA_INSTANCE_URL);
+    	return getMetadata().get(METADATA_INSTANCE_URL);
     }
     
     public void setInstanceUrl(String instanceUrl) {
-    	metadata.put(METADATA_INSTANCE_URL, instanceUrl);
+    	getMetadata().put(METADATA_INSTANCE_URL, instanceUrl);
     }
     
     public String getScmUrl() {
-    	return metadata.get(METADATA_SCM_URL);
+    	return getMetadata().get(METADATA_SCM_URL);
     }
     
     public void setScmUrl(String scmUrl) {
-    	metadata.put(METADATA_SCM_URL, scmUrl);
+    	getMetadata().put(METADATA_SCM_URL, scmUrl);
     }
     
     public String getScmBranch() {
-    	return metadata.get(METADATA_SCM_BRANCH);
+    	return getMetadata().get(METADATA_SCM_BRANCH);
     }
     
     public void setScmBranch(String scmBranch) {
-    	metadata.put(METADATA_SCM_BRANCH, scmBranch);
+    	getMetadata().put(METADATA_SCM_BRANCH, scmBranch);
     }
     
     public String getScmRevisionNumber() {
-    	return metadata.get(METADATA_SCM_REVISION_NUMBER);
+    	return getMetadata().get(METADATA_SCM_REVISION_NUMBER);
     }
     
     public void setScmRevisionNumber(String scmRevisionNumber) {
-    	metadata.put(METADATA_SCM_REVISION_NUMBER, scmRevisionNumber);
+    	getMetadata().put(METADATA_SCM_REVISION_NUMBER, scmRevisionNumber);
     }
 
     public String getType() {
@@ -234,11 +230,11 @@ public class BinaryArtifact extends BaseModel {
         this.type = type;
     }
 
-    public String getCreatedTimeStamp() {
+    public long getCreatedTimeStamp() {
         return createdTimeStamp;
     }
 
-    public void setCreatedTimeStamp(String createdTimeStamp) {
+    public void setCreatedTimeStamp(long createdTimeStamp) {
         this.createdTimeStamp = createdTimeStamp;
     }
 
@@ -250,11 +246,11 @@ public class BinaryArtifact extends BaseModel {
         this.createdBy = createdBy;
     }
 
-    public String getModifiedTimeStamp() {
+    public long getModifiedTimeStamp() {
         return modifiedTimeStamp;
     }
 
-    public void setModifiedTimeStamp(String modifiedTimeStamp) {
+    public void setModifiedTimeStamp(long modifiedTimeStamp) {
         this.modifiedTimeStamp = modifiedTimeStamp;
     }
 
@@ -287,10 +283,59 @@ public class BinaryArtifact extends BaseModel {
     	return metadata;
     }
 
+
+    public String getAuthorLDAPDN() {
+        return authorLDAPDN;
+    }
+
+    public void setAuthorLDAPDN(String authorLDAPDN) {
+        this.authorLDAPDN = authorLDAPDN;
+    }
+
+    public void setVirtualRepos(List<String> virtualRepos) {
+        this.virtualRepos = virtualRepos;
+    }
+
+    public List<String> getVirtualRepos() {
+        return virtualRepos;
+    }
+
+
+    public List<Build> getBuildInfos() {
+        return buildInfos;
+    }
+
+    public void addBuild(Build build){
+	    getBuildInfos().add(build);
+    }
+
+    public void setBuildInfos(List<Build> buildInfos) {
+        this.buildInfos = buildInfos;
+    }
+
+
     public static final Comparator<BinaryArtifact> TIMESTAMP_COMPARATOR = new Comparator<BinaryArtifact>() {
         @Override
         public int compare(BinaryArtifact o1, BinaryArtifact o2) {
             return Long.compare(o1.getTimestamp(), o2.getTimestamp());
         }
     };
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null || getClass() != obj.getClass())
+            return false;
+
+        BinaryArtifact that = (BinaryArtifact) obj;
+        return Objects.equals(getArtifactName(),that.getArtifactName()) &&
+                Objects.equals(getArtifactVersion(),that.getArtifactVersion());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getArtifactName(), getArtifactVersion());
+    }
+
 }

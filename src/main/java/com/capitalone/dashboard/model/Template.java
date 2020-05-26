@@ -3,6 +3,7 @@ package com.capitalone.dashboard.model;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -17,9 +18,9 @@ public class Template extends BaseModel {
     @Indexed(unique = true)
     private String template;
 
-    private List<String> widgets;
+    private List<String> widgets = new ArrayList<>();
 
-    private List<String> order;
+    private List<String> order = new ArrayList<>();
 
     public Template(String template, List<String> widgets, List<String> order) {
         this.template = template;

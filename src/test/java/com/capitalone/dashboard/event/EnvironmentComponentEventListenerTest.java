@@ -34,6 +34,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.data.mongodb.core.mapping.event.AfterSaveEvent;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -115,7 +116,7 @@ public class EnvironmentComponentEventListenerTest {
     private BinaryArtifact getBinaryArtifact() {
         BinaryArtifact binaryArtifact = new BinaryArtifact();
         binaryArtifact.setTimestamp(374268428);
-        binaryArtifact.setBuildInfo(createBuild());
+        binaryArtifact.setBuildInfos(Arrays.asList(createBuild()));
         return binaryArtifact;
     }
 
@@ -129,7 +130,9 @@ public class EnvironmentComponentEventListenerTest {
 
         Application application = new Application("app", component);
         List<String> activeWidgets = new ArrayList<>();
-        Dashboard dashboard = new Dashboard("template", "title", application, new Owner("owner", AuthType.STANDARD),  DashboardType.Team , "ASVTEST", "BAPTEST", activeWidgets, false, ScoreDisplayType.HEADER);
+        List<Owner> owners = new ArrayList<Owner>();
+        owners.add(new Owner("owner", AuthType.STANDARD));
+        Dashboard dashboard = new Dashboard("template", "title", application, owners,  DashboardType.Team , "ASVTEST", "BAPTEST", activeWidgets, false, ScoreDisplayType.HEADER);
         dashboard.setId(ObjectId.get());
         return dashboard;
     }

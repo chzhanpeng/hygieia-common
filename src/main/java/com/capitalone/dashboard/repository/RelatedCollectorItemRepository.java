@@ -28,4 +28,6 @@ public interface RelatedCollectorItemRepository extends QueryRepository<RelatedC
         related.setReason(reason);
         return save(related);
     }
+    List<RelatedCollectorItem> findAllByCreationTimeIsBetweenOrderByCreationTimeDesc(long beginDate, long endDate);
+    List<RelatedCollectorItem> findAllByReasonAndCreationTimeIsBetweenOrderByCreationTimeDesc(String reason, long beginDate, long endDate);
 }

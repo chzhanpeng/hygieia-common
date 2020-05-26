@@ -15,6 +15,7 @@ import org.bson.types.ObjectId;
 import org.junit.Ignore;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -60,7 +61,7 @@ public class TestUtils {
     public static BinaryArtifact getBinaryArtifact() {
         BinaryArtifact binaryArtifact = new BinaryArtifact();
         binaryArtifact.setTimestamp(374268428);
-        binaryArtifact.setBuildInfo(createBuild());
+        binaryArtifact.setBuildInfos(Arrays.asList(createBuild()));
         return binaryArtifact;
     }
 
@@ -69,7 +70,7 @@ public class TestUtils {
         build.setBuildStatus(BuildStatus.Success);
         build.setNumber("1");
         build.setCollectorItemId(new ObjectId());
-        List<SCM> sourceChangeSet = new ArrayList<>();
+        List<SCM> sourceChangeSet = new ArrayList();
         sourceChangeSet.add(getScm("scmRev1"));
         sourceChangeSet.add(getScm("scmRev2"));
         build.setSourceChangeSet(sourceChangeSet);

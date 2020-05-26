@@ -36,10 +36,20 @@ public interface BaseCollectorItemRepository<T extends CollectorItem> extends Qu
     List<T> findByCollectorIdIn(Collection<ObjectId> ids);
 
     /**
+     * Finds all {@link CollectorItem}s that match the provided id's.
+     *
+     * @param ids {@link Collection} of ids
+     * @param pageable
+     * @return Page of {@link CollectorItem}s
+     */
+    Page<T> findByCollectorIdIn(Collection<ObjectId> ids, Pageable pageable);
+    
+    /**
      * Finds paged results of {@link CollectorItem}s that match the provided id's.
      *
-     * @param ids    {@link Collection} of ids
-     * @param {@link org.springframework.data.domain.Pageable} object to determine which page to return
+     * @param ids {@link Collection} of ids
+     * @param description {@link String}
+     * @param pageable {@link org.springframework.data.domain.Pageable} object to determine which page to return
      * @return page of {@link CollectorItem}s
      */
     Page<T> findByCollectorIdInAndDescriptionContainingIgnoreCase(Collection<ObjectId> ids, String description, Pageable pageable);

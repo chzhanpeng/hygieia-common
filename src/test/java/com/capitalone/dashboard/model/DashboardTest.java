@@ -1,5 +1,6 @@
 package com.capitalone.dashboard.model;
 
+import com.capitalone.dashboard.misc.HygieiaException;
 import com.capitalone.dashboard.util.PipelineUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,7 +17,7 @@ import static org.junit.Assert.assertEquals;
 public class DashboardTest {
 
     @Test
-    public void findEnvironmentMappings(){
+    public void findEnvironmentMappings() throws HygieiaException {
         Dashboard dashboard = makeTeamDashboard("template", "title", "appName","" ,"ASVTEST","BAPTEST", "comp1", "comp2");
         dashboard.getWidgets().add(makePipelineWidget("DEV", "QA", null, null, "PROD"));
         Widget buildWidget = new Widget();
@@ -39,7 +40,7 @@ public class DashboardTest {
     }
 
     @Test
-    public void findEnvironmentMappings_no_mappings_configured(){
+    public void findEnvironmentMappings_no_mappings_configured() throws HygieiaException{
         Dashboard dashboard = makeTeamDashboard("template", "title", "appName","","ASVTEST", "BAPTEST","comp1", "comp2");
         Map<PipelineStage, String> expected = new HashMap<>();
 
@@ -53,7 +54,9 @@ public class DashboardTest {
             app.addComponent(new Component(compName));
         }
         List<String> activeWidgets = new ArrayList<>();
-        Dashboard dashboard = new Dashboard(template, title, app, new Owner(owner, AuthType.STANDARD), DashboardType.Team,configItemAppName, configItemComponentName, activeWidgets, false, ScoreDisplayType.HEADER);
+        List<Owner> owners = new ArrayList<Owner>();
+        owners.add(new Owner("owner", AuthType.STANDARD));
+        Dashboard dashboard = new Dashboard(template, title, app, owners, DashboardType.Team,configItemAppName, configItemComponentName, activeWidgets, false, ScoreDisplayType.HEADER);
         return dashboard;
     }
 

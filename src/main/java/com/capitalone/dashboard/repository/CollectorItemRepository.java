@@ -58,6 +58,11 @@ public interface CollectorItemRepository extends BaseCollectorItemRepository<Col
                 quote(branch) + " and enabled eq " + enabled);
     }
 
+    default CollectorItem findRepoByUrlAndBranch(ObjectId collectorId, String url, String branch) {
+        return findOne("collectorId eq " + quote(collectorId.toHexString()) + " and options.url startsWithIgnoreCase " + quote(url) + " and options.branch startsWithIgnoreCase " +
+                quote(branch));
+    }
+
     default Page<CollectorItem> findByCollectorIdAndSearchField(List<ObjectId> collectorIds, String searchField, String searchFieldValue, Pageable pageable) {
         String query = "collectorId in " + in(collectorIds.stream().map(ObjectId::toHexString).collect(Collectors.toList()))
                 + " and " + searchField + " containsIgnoreCase " + quote(searchFieldValue);
@@ -79,8 +84,11 @@ public interface CollectorItemRepository extends BaseCollectorItemRepository<Col
         return findOne("options.teamId eq " + quote(projectId));
     }
 
+    default List<CollectorItem> findByDescription(String description) { return findAll("description eq " + quote(description)); }
 
-    List<CollectorItem> findByDescription(String description);
+    default List<CollectorItem> findByArtifactNameAndPath(String artifactName, String path) {
+        return findAll(("options.artifactName eq " + quote(artifactName) + " and options.path eq " + quote(path)));
+    }
 
     default Iterable<CollectorItem> findAllByOptionNameValue(String optionName, String optionValue) {
         try {

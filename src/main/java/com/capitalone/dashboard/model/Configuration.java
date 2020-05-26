@@ -6,13 +6,13 @@ import java.util.Base64;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Pattern;
+//import java.util.regex.Pattern;
 
 @Document(collection = "configuration")
 public class Configuration extends BaseModel {
 
 	private final static String PREFIX = "BASE64:";
-	private static final Pattern COMPILE = Pattern.compile(PREFIX);
+	//private static final Pattern COMPILE = Pattern.compile(PREFIX);
 
 	public Configuration(String collectorName, Set<Map<String, String>> info) {
 		super();
@@ -26,7 +26,7 @@ public class Configuration extends BaseModel {
 				String password = info.get("password");
 				if(password.contains(PREFIX)){
 					Base64.Decoder decoder = Base64.getDecoder();
-					password = new String(decoder.decode(COMPILE.matcher(password).replaceFirst("").trim()));
+					password = new String(decoder.decode(password.replaceFirst(PREFIX, "").trim()));
 				} else {
 					Base64.Encoder encoder = Base64.getEncoder();
 					password = PREFIX + encoder.encodeToString(password.getBytes());

@@ -26,7 +26,7 @@ public final class Encryption {
     }
 
     public static String getStringKey() throws EncryptionException {
-        SecretKey key;
+        SecretKey key = null;
         try {
             key = KeyGenerator.getInstance(ALGO).generateKey();
         } catch (NoSuchAlgorithmException e) {
@@ -36,7 +36,7 @@ public final class Encryption {
     }
 
     public static SecretKey getSecretKey() throws EncryptionException {
-        SecretKey key;
+        SecretKey key = null;
         try {
             key = KeyGenerator.getInstance(ALGO).generateKey();
         } catch (NoSuchAlgorithmException e) {
@@ -47,7 +47,7 @@ public final class Encryption {
 
     public static String encryptString(String message, SecretKey key)
             throws EncryptionException {
-        String encryptedMessage;
+        String encryptedMessage = "";
         try {
             Cipher cipher = Cipher.getInstance(ALGO);
             cipher.init(Cipher.ENCRYPT_MODE, key);
@@ -65,7 +65,7 @@ public final class Encryption {
 
     public static String decryptString(String encryptedMessage, SecretKey key)
             throws EncryptionException {
-        String decryptedMessage;
+        String decryptedMessage = "";
         try {
             Cipher decipher = Cipher.getInstance(ALGO);
             decipher.init(Cipher.DECRYPT_MODE, key);

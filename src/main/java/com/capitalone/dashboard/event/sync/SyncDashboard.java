@@ -1,5 +1,6 @@
 package com.capitalone.dashboard.event.sync;
 
+import com.capitalone.dashboard.event.constants.sync.Reason;
 import com.capitalone.dashboard.model.BaseModel;
 import com.capitalone.dashboard.model.Build;
 import com.capitalone.dashboard.model.CodeQuality;
@@ -8,6 +9,7 @@ import com.capitalone.dashboard.model.CollectorItem;
 import com.capitalone.dashboard.model.CollectorType;
 import com.capitalone.dashboard.model.Component;
 import com.capitalone.dashboard.model.Dashboard;
+import com.capitalone.dashboard.model.FeatureFlag;
 import com.capitalone.dashboard.model.RepoBranch;
 import com.capitalone.dashboard.model.StandardWidget;
 import com.capitalone.dashboard.model.Widget;
@@ -18,17 +20,25 @@ import com.capitalone.dashboard.repository.CollectorItemRepository;
 import com.capitalone.dashboard.repository.CollectorRepository;
 import com.capitalone.dashboard.repository.ComponentRepository;
 import com.capitalone.dashboard.repository.DashboardRepository;
+import com.capitalone.dashboard.repository.FeatureFlagRepository;
 import com.capitalone.dashboard.repository.RelatedCollectorItemRepository;
+import com.capitalone.dashboard.util.FeatureFlagsEnum;
+import com.capitalone.dashboard.util.HygieiaUtils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.IterableUtils;
+import org.apache.commons.collections4.PredicateUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -41,15 +51,15 @@ public class SyncDashboard {
     private final BuildRepository buildRepository;
     private final RelatedCollectorItemRepository relatedCollectorItemRepository;
     private final CodeQualityRepository codeQualityRepository;
+    private final FeatureFlagRepository featureFlagRepository;
 
-    private static final String BUILD_REPO_REASON = "Code Repo build";
-    private static final String CODEQUALITY_TRIGGERED_REASON = "Code scan triggered by build";
 
     @Autowired
     public SyncDashboard(DashboardRepository dashboardRepository, ComponentRepository componentRepository,
                          CollectorRepository collectorRepository, CollectorItemRepository collectorItemRepository,
                          BuildRepository buildRepository, RelatedCollectorItemRepository relatedCollectorItemRepository,
-                         CodeQualityRepository codeQualityRepository) {
+                         CodeQualityRepository codeQualityRepository,
+                         FeatureFlagRepository featureFlagRepository) {
         this.dashboardRepository = dashboardRepository;
         this.componentRepository = componentRepository;
         this.collectorRepository = collectorRepository;
@@ -57,17 +67,18 @@ public class SyncDashboard {
         this.buildRepository = buildRepository;
         this.relatedCollectorItemRepository = relatedCollectorItemRepository;
         this.codeQualityRepository = codeQualityRepository;
+        this.featureFlagRepository = featureFlagRepository;
     }
 
 
     /**
      * Get the widget by name from a dashboard
      *
-     * @param name
-     * @param dashboard
-     * @return widget
+     * @param name name of the widget
+     * @param dashboard Dashboard
+     * @return widget Widget
      */
-    public static Widget getWidget(String name, Dashboard dashboard) {
+    public Widget getWidget(String name, Dashboard dashboard) {
         List<Widget> widgets = dashboard.getWidgets();
         return widgets.stream().filter(widget -> widget.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
     }
@@ -80,38 +91,53 @@ public class SyncDashboard {
      */
     private void addCollectorItemToDashboard(List<Dashboard> existingDashboards, CollectorItem collectorItem, CollectorType collectorType, boolean addWidget) {
         if (CollectionUtils.isEmpty(existingDashboards)) return;
-        /**
+
+        /*
+         * Add feature flag capability to toggle between automatic association vs manual association
+         * if auto_discover record exists then it is considered manual association and the association
+         * will be handled by the hygieia-relateditems-collector.
+         */
+        FeatureFlag featureFlag = featureFlagRepository.findByName(FeatureFlagsEnum.auto_discover.toString());
+
+        /*
          * The assumption is the dashboard already has a SCM widget and the sync process should not add SCM widgets.
          */
         if(CollectorType.SCM.equals(collectorType)) return;
 
-        // if the additional association logic does not comply do not associate
-        existingDashboards.forEach(dashboard -> {
-            ObjectId componentId = dashboard.getWidgets().get(0).getComponentId();
+        for(Dashboard dashboard : existingDashboards) {
+            if (CollectionUtils.isEmpty(dashboard.getApplication().getComponents())) continue;
+            ObjectId componentId = dashboard.getApplication().getComponents().get(0).getId();
+            if (componentId == null) continue;
             StandardWidget standardWidget = new StandardWidget(collectorType, componentId);
-            Component component = componentRepository.findOne("id eq '" + componentId.toHexString() + '\'');
-            if (component == null) return;
-            if (!associateByType(collectorType, component, collectorItem)) return;
+            Component component = componentRepository.findOne(componentId);
+            if (component == null) continue;
+
+            // if the additional association logic does not comply do not associate
+            if(!associateByType(collectorType, component, collectorItem, featureFlag)) continue;
+
             component.addCollectorItem(collectorType, collectorItem);
             componentRepository.save(component);
             collectorItem.setEnabled(true);
             collectorItemRepository.save(collectorItem);
+
             if (addWidget && (getWidget(standardWidget.getName(), dashboard) == null)) {
                 Widget widget = standardWidget.getWidget();
                 dashboard.getWidgets().add(widget);
                 dashboardRepository.save(dashboard);
             }
-        });
+        }
     }
+
 
     /*
     * Additional logic for association by Collector Type
     * */
-    private boolean associateByType(CollectorType collectorType, Component component, CollectorItem collectorItem) {
+    private boolean associateByType(CollectorType collectorType, Component component, CollectorItem collectorItem, FeatureFlag featureFlag) {
         switch (collectorType) {
-            case Build: return associateBuild(component,collectorItem);
-            case CodeQuality: return associateCodeQuality(component,collectorItem);
-            default: return true;
+            // if auto_discover feature flag is turned on then do not sync
+            case Build: return HygieiaUtils.allowSync(featureFlag, collectorType) && associateBuild(component,collectorItem);
+            case CodeQuality: return HygieiaUtils.allowSync(featureFlag, collectorType) && associateCodeQuality(component,collectorItem);
+            default: return HygieiaUtils.allowSync(featureFlag, collectorType);
         }
     }
 
@@ -142,7 +168,7 @@ public class SyncDashboard {
         CodeQuality entity = codeQualityRepository.findTop1ByCollectorItemIdOrderByTimestampDesc(collectorItem.getId());
         if(entity == null || entity.getBuildId() == null) return false;
 
-        Build build = buildRepository.findOne("id eq '" + entity.getBuildId().toHexString() + '\'');
+        Build build = buildRepository.findOne(entity.getBuildId());
         if(build == null || CollectionUtils.isEmpty(build.getCodeRepos())) return false;
 
         Set<RepoBranch> validRepoBranchSet = buildValidRepoBranches(component, getRepoType(build));
@@ -154,7 +180,7 @@ public class SyncDashboard {
     /*
      * Build a unique set of Valid RepoBranches by checking all SCM CollectorItems.
      * */
-    private static Set<RepoBranch> buildValidRepoBranches(@NotNull Component component, @NotNull RepoBranch.RepoType repoType) {
+    private Set<RepoBranch> buildValidRepoBranches (@NotNull Component component, @NotNull RepoBranch.RepoType repoType) {
         List<CollectorItem> scmCollectorItems = Lists.newArrayList(component.getCollectorItems(CollectorType.SCM));
         return Sets.newConcurrentHashSet(scmCollectorItems.stream()
                 .map(item -> new RepoBranch(String.valueOf(item.getOptions().get("url")),
@@ -163,7 +189,7 @@ public class SyncDashboard {
     }
 
     /*
-    * Retrieve Repotype from Build.
+    * Retrieve Repository type from Build.
     * */
     private RepoBranch.RepoType getRepoType(@NotNull Build build) {
         if(CollectionUtils.isEmpty(build.getCodeRepos())) return RepoBranch.RepoType.Unknown;
@@ -183,7 +209,7 @@ public class SyncDashboard {
         }
         List<ObjectId> collectorItemIds = collectorItems.stream().map(BaseModel::getId).collect(Collectors.toList());
         // Find the components that have these collector items
-        List<Component> components = componentRepository.findByCollectorTypeAndItemIdIn(collectorType, collectorItemIds);
+        List<com.capitalone.dashboard.model.Component> components = componentRepository.findByCollectorTypeAndItemIdIn(collectorType, collectorItemIds);
         List<ObjectId> componentIds = components.stream().map(BaseModel::getId).collect(Collectors.toList());
         return dashboardRepository.findByApplicationComponentIdsIn(componentIds);
     }
@@ -196,7 +222,7 @@ public class SyncDashboard {
      */
     public void sync(Build build) {
 
-        /** Step 1: Add build collector item to Dashboard if built repo is in on the dashboard. **/
+        /* Step 1: Add build collector item to Dashboard if built repo is in on the dashboard. */
 
         // Find the collectorItem of build
         CollectorItem buildCollectorItem = collectorItemRepository.findOne(build.getCollectorItemId());
@@ -213,14 +239,26 @@ public class SyncDashboard {
         Set<CollectorItem> repoCollectorItemsInBuild = new HashSet<>();
 
         //create a list of the repo collector items that are being built, most cases have only 1
-        repos.stream().map(repoBranch -> collectorItemRepository.findAllByOptionNameValueAndCollectorIdsIn("url", repoBranch.getUrl(), scmCollectorIds))
-                .forEach(collectorItems -> CollectionUtils.addAll(repoCollectorItemsInBuild, collectorItems.iterator()));
+        if (CollectionUtils.isEmpty(repos)) return;
+        CollectionUtils.filter(repos, PredicateUtils.notNullPredicate());
+        repos.forEach((
+                repoBranch -> {
+                    Map<String, Object> options = new HashMap<>();
+                    options.put("url", repoBranch.getUrl());
+                    if (StringUtils.isNotEmpty(repoBranch.getBranch())) {
+                        options.put("branch", repoBranch.getBranch());
+                    }
+                    repoCollectorItemsInBuild.addAll(IterableUtils.toList(collectorItemRepository.findAllByOptionMapAndCollectorIdsIn(options, scmCollectorIds)));
 
+                }));
+
+        repoCollectorItemsInBuild.forEach(rci->{
+            rci.setEnabled(true);
+            collectorItemRepository.save(rci);
+        });
         // For each repo collector item, add the item to the referenced dashboards
         repoCollectorItemsInBuild.forEach(
-                ci -> {
-                    relatedCollectorItemRepository.saveRelatedItems(buildCollectorItem.getId(), ci.getId(), this.getClass().toString(),  BUILD_REPO_REASON);
-                }
+                ci -> relatedCollectorItemRepository.saveRelatedItems(buildCollectorItem.getId(), ci.getId(), this.getClass().toString(), Reason.BUILD_REPO_REASON.getAction())
         );
     }
 
@@ -232,9 +270,9 @@ public class SyncDashboard {
     public void sync(CodeQuality codeQuality) {
         ObjectId buildId = codeQuality.getBuildId();
         if (buildId == null) return;
-        Build build = buildRepository.findOne("id eq '" + buildId.toHexString() + '\'');
+        Build build = buildRepository.findOne(buildId);
         if (build == null) return;
-        relatedCollectorItemRepository.saveRelatedItems(build.getCollectorItemId(), codeQuality.getCollectorItemId(), this.getClass().toString(), CODEQUALITY_TRIGGERED_REASON);
+        relatedCollectorItemRepository.saveRelatedItems(build.getCollectorItemId(), codeQuality.getCollectorItemId(), this.getClass().toString(), Reason.CODEQUALITY_TRIGGERED_REASON.getAction());
     }
 
 
@@ -244,7 +282,7 @@ public class SyncDashboard {
      * @param relatedCollectorItem
      * @throws SyncException
      */
-    public void sync(RelatedCollectorItem relatedCollectorItem) throws SyncException{
+    public void sync(RelatedCollectorItem relatedCollectorItem,boolean addWidget) throws SyncException{
         ObjectId left = relatedCollectorItem.getLeft();
         ObjectId right = relatedCollectorItem.getRight();
         CollectorItem leftItem = collectorItemRepository.findOne(left);
@@ -253,8 +291,8 @@ public class SyncDashboard {
         if (leftItem == null) throw new SyncException("Missing left collector item");
         if (rightItem == null) throw new SyncException("Missing right collector item");
 
-        Collector leftCollector = collectorRepository.findOne("id eq '" + leftItem.getCollectorId().toHexString() + '\'');
-        Collector rightCollector = collectorRepository.findOne("id eq '" + rightItem.getCollectorId().toHexString() + '\'');
+        Collector leftCollector = collectorRepository.findOne(leftItem.getCollectorId());
+        Collector rightCollector = collectorRepository.findOne(rightItem.getCollectorId());
 
         if (leftCollector == null) throw new SyncException("Missing left collector");
         if (rightCollector == null) throw new SyncException("Missing right collector");
@@ -262,8 +300,8 @@ public class SyncDashboard {
         List<Dashboard> dashboardsWithLeft = getDashboardsByCollectorItems(Sets.newHashSet(leftItem), leftCollector.getCollectorType());
         List<Dashboard> dashboardsWithRight = getDashboardsByCollectorItems(Sets.newHashSet(rightItem), rightCollector.getCollectorType());
 
-        addCollectorItemToDashboard(dashboardsWithLeft, rightItem, rightCollector.getCollectorType(), true);
-        addCollectorItemToDashboard(dashboardsWithRight, leftItem, leftCollector.getCollectorType(), true);
+        addCollectorItemToDashboard(dashboardsWithLeft, rightItem, rightCollector.getCollectorType(), addWidget);
+        addCollectorItemToDashboard(dashboardsWithRight, leftItem, leftCollector.getCollectorType(), addWidget);
     }
 
 }
