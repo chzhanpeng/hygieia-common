@@ -10,7 +10,20 @@
     <description>Core package shared by API layer and Microservices</description>
     <url>https://github.com/Hygieia/${project.artifactId}</url>
 
+    <organization>
+        <name>Hygieia</name>
+        <url>https://www.github.com/Hygieia</url>
+    </organization>
+
+    <licenses>
+        <license>
+            <name>The Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+
     <properties>
+        <repository.name>hygieia-common</repository.name>
         <hygieia.query.version>1.0.0</hygieia.query.version>
         <guava.version>27.0.1-jre</guava.version>
         <hamcrest.version>1.3</hamcrest.version>
@@ -48,6 +61,28 @@
         <site.publish.checkout.directory>site-content</site.publish.checkout.directory>
         <spotbugs.plugin.version>3.1.11</spotbugs.plugin.version>
     </properties>
+
+    <developers>
+        <developer>
+            <name>Tapabrata Topo Pal</name>
+            <email>tapabrata.pal@capitalone.com</email>
+            <organization>CapitalOne</organization>
+            <organizationUrl>http://www.capitalone.com</organizationUrl>
+        </developer>
+        <developer>
+            <name>Raghavendra Vema</name>
+            <email>ragha.vema@capitalone.com</email>
+            <organization>CapitalOne</organization>
+            <organizationUrl>http://www.capitalone.com</organizationUrl>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:https://github.com/Hygieia/${repository.name}.git</connection>
+        <developerConnection>scm:git:https://github.com/Hygieia/${repository.name}.git
+        </developerConnection>
+        <url>https://github.com/Hygieia/${repository.name}</url>
+    </scm>
 
     <distributionManagement>
         <snapshotRepository>
