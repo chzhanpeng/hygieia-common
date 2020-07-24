@@ -201,7 +201,7 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-validator</artifactId>
-            <version>6.0.7.Final</version>
+            <version>6.1.5.Final</version>
         </dependency>
         <dependency>
             <groupId>javax.el</groupId>
@@ -670,19 +670,19 @@
                                 <configuration>
                                     <tasks>
                                         <exec executable="git">
-                                            <arg line="clone -b gh-pages --single-branch ${site.publish.url} ${site.publish.checkout.directory}" />
+                                            <arg line="clone -b gh-pages --single-branch ${site.publish.url} ${site.publish.checkout.directory}"/>
                                         </exec>
 
                                         <exec executable="git" dir="site-content">
-                                            <arg line="fetch origin gh-pages" />
+                                            <arg line="fetch origin gh-pages"/>
                                         </exec>
 
                                         <exec executable="git" dir="site-content">
-                                            <arg line="reset --hard origin/gh-pages" />
+                                            <arg line="reset --hard origin/gh-pages"/>
                                         </exec>
 
                                         <pathconvert pathsep=" " property="dirs">
-                                            <dirset dir="${site.publish.checkout.directory}" includes="*" />
+                                            <dirset dir="${site.publish.checkout.directory}" includes="*"/>
                                         </pathconvert>
                                     </tasks>
                                 </configuration>
