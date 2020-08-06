@@ -111,7 +111,7 @@
         <dependency>
             <groupId>com.capitalone.dashboard</groupId>
             <artifactId>hygieia-query</artifactId>
-            <version>1.0.0</version>
+            <version>${hygieia.query.version}</version>
         </dependency>
 
         <dependency>
