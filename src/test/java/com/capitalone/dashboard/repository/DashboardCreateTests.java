@@ -73,7 +73,7 @@ public class DashboardCreateTests extends MongoServerBaseRepositoryTest {
 
 
 
-        for (Dashboard d : dashboardRepository.findAll(new Sort(Sort.Direction.ASC, "title"))) {
+        for (Dashboard d : dashboardRepository.findAll(Sort.by(Sort.Direction.ASC, "title"))) {
             System.out.println(d.getTitle());
             assertEquals(d.getTitle(), "Jays's Dashboard");
         }
