@@ -204,12 +204,7 @@ public class ChangeOrder extends BaseModel{
      */
     @Override
     public String toString() {
-
-        StringBuffer buf = new StringBuffer(210);
-        buf.append("changeID: ")
-                .append(changeID);
-
-        return buf.toString();
+        return "changeID: " + changeID;
     }
 
     @Override

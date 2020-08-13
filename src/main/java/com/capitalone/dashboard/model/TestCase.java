@@ -137,14 +137,6 @@ public class TestCase {
         return testSteps;
     }
 
-    public int getUnknownStatusTestStepCount() {
-        return unknownStatusTestStepCount;
-    }
-
-    public void setUnknownStatusTestStepCount(int unknownStatusTestStepCount) {
-        this.unknownStatusTestStepCount = unknownStatusTestStepCount;
-    }
-
     public Set<String> getTags() {
         return tags;
     }

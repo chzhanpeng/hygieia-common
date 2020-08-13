@@ -56,7 +56,7 @@ public class MongoConfig extends AbstractMongoConfiguration {
     public MongoClient mongoClient() {
 
         MongoClient client;
-        LOGGER.info("ReplicaSet" + dbreplicaset);
+        LOGGER.info("ReplicaSet {}", dbreplicaset);
 
         MongoClientOptions.Builder builder = new MongoClientOptions.Builder();
         builder.maxConnectionIdleTime(60000);
@@ -69,8 +69,8 @@ public class MongoConfig extends AbstractMongoConfiguration {
         if (Boolean.parseBoolean(dbreplicaset)) {
             List<ServerAddress> serverAddressList = new ArrayList<>();
             for (String h : hostport) {
-                String myHost = h.substring(0, h.indexOf(":"));
-                int myPort = Integer.parseInt(h.substring(h.indexOf(":") + 1));
+                String myHost = h.substring(0, h.indexOf(':'));
+                int myPort = Integer.parseInt(h.substring(h.indexOf(':') + 1));
                 ServerAddress serverAddress = new ServerAddress(myHost, myPort);
                 serverAddressList.add(serverAddress);
             }
@@ -106,6 +106,7 @@ public class MongoConfig extends AbstractMongoConfiguration {
     }
 
     @Bean
+    @Override
     public MongoTemplate mongoTemplate() throws Exception {
         return new MongoTemplate(mongoClient(), getDatabaseName());
     }

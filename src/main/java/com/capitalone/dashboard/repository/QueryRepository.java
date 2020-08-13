@@ -38,7 +38,7 @@ public interface QueryRepository<T> extends OneQueryExecutor<T, ObjectId> {
         }
     }
 
-
+    @Override
     default T findOne (String query) {
         try {
             Iterable<T> items = find(query);

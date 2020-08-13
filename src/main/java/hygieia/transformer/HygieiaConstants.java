@@ -1,7 +1,7 @@
 package hygieia.transformer;
 
 
-public class HygieiaConstants {
+public final class HygieiaConstants {
     public static final String FUNCTIONAL_TEST_DISPLAY = "Function Test";
     public static final String INTEGRATION_TEST_DISPLAY = "Integration Test";
     public static final String PERFORMANCE_TEST_DISPLAY = "Performance Test";
@@ -13,4 +13,6 @@ public class HygieiaConstants {
     public static final String MOCHA_JS_SPEC = "Mocha (JS Spec)";
 
     public static final String COLLECTOR_ITEM_DEPLOYMENT = "deployment";
+
+    private HygieiaConstants() {}
 }
