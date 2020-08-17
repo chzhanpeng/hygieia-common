@@ -113,12 +113,12 @@ public class TestCase {
         this.skippedTestStepCount = skippedTestStepCount;
     }
 
-    public int getUnknownStatusCount() {
+    public int getUnknownStatusTestStepCount() {
         return unknownStatusTestStepCount;
     }
 
-    public void setUnknownStatusCount(int unknownStatusCount) {
-        this.unknownStatusTestStepCount = unknownStatusCount;
+    public void setUnknownStatusTestStepCount(int unknownStatusTestStepCount) {
+        this.unknownStatusTestStepCount = unknownStatusTestStepCount;
     }
 
     public TestCaseStatus getStatus() {
