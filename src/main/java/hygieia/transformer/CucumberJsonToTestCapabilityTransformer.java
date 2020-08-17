@@ -112,7 +112,7 @@ public class CucumberJsonToTestCapabilityTransformer {
         testCase.setSuccessTestStepCount(testStepSuccessCount);
         testCase.setSkippedTestStepCount(testStepSkippedCount);
         testCase.setFailedTestStepCount(testStepFailCount);
-        testCase.setUnknownStatusCount(testStepUnknownCount);
+        testCase.setUnknownStatusTestStepCount(testStepUnknownCount);
         testCase.setTotalTestStepCount(testCase.getTestSteps().size());
         // Set Status
         if (testStepFailCount > 0) {
