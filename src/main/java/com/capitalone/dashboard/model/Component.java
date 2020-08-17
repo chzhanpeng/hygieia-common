@@ -70,11 +70,11 @@ public class Component extends BaseModel {
     }
 
     public void updateCollectorItem(CollectorType collectorType, CollectorItem collectorItem) {
-            List<CollectorItem> existing = new ArrayList<> (collectorItems.get(collectorType));
-            if (!isNewCollectorItem(existing, collectorItem)) {
-                findCollectorItem(existing,collectorItem).setLastUpdated(collectorItem.getLastUpdated());
-                collectorItems.put(collectorType, existing);
-            }
+        List<CollectorItem> existing = new ArrayList<> (collectorItems.get(collectorType));
+        if (!isNewCollectorItem(existing, collectorItem)) {
+            findCollectorItem(existing,collectorItem).setLastUpdated(collectorItem.getLastUpdated());
+            collectorItems.put(collectorType, existing);
+        }
     }
 
     private boolean isNewCollectorItem (List<CollectorItem> existing, CollectorItem item) {
@@ -86,21 +86,17 @@ public class Component extends BaseModel {
     }
 
     public CollectorItem getFirstCollectorItemForType(CollectorType type){
-
         if(getCollectorItems().get(type) == null) {
             return null;
         }
-        List<CollectorItem> collectorItems = new ArrayList<>(getCollectorItems().get(type));
-        return collectorItems.get(0);
+        return getCollectorItems().get(type).get(0);
     }
 
     public CollectorItem getLastUpdatedCollectorItemForType(CollectorType type){
-
         if(getCollectorItems().get(type) == null || getCollectorItems().get(type).isEmpty()) {
             return null;
         }
-        List<CollectorItem> collectorItems = new ArrayList<>(getCollectorItems().get(type));
-        return getLastUpdateItem(collectorItems);
+        return getLastUpdateItem(getCollectorItems().get(type));
     }
 
     private CollectorItem getLastUpdateItem(List<CollectorItem> collectorItems){

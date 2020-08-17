@@ -69,6 +69,7 @@ public interface BaseCollectorItemRepository<T extends CollectorItem> extends Qu
 
     Page<T> findByCollectorIdInAndDescriptionContainingAndNiceNameContainingAllIgnoreCase(Collection<ObjectId> ids, String jobName, String niceName, Pageable pageable);
 
+    @Override
     default T findOne(ObjectId id) {
         return findOne("id eq '" + id + '\'');
     }

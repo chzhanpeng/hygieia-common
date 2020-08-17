@@ -113,12 +113,12 @@ public class TestCase {
         this.skippedTestStepCount = skippedTestStepCount;
     }
 
-    public int getUnknownStatusCount() {
+    public int getUnknownStatusTestStepCount() {
         return unknownStatusTestStepCount;
     }
 
-    public void setUnknownStatusCount(int unknownStatusCount) {
-        this.unknownStatusTestStepCount = unknownStatusCount;
+    public void setUnknownStatusTestStepCount(int unknownStatusTestStepCount) {
+        this.unknownStatusTestStepCount = unknownStatusTestStepCount;
     }
 
     public TestCaseStatus getStatus() {
@@ -135,14 +135,6 @@ public class TestCase {
 
     public Collection<TestCaseStep> getTestSteps() {
         return testSteps;
-    }
-
-    public int getUnknownStatusTestStepCount() {
-        return unknownStatusTestStepCount;
-    }
-
-    public void setUnknownStatusTestStepCount(int unknownStatusTestStepCount) {
-        this.unknownStatusTestStepCount = unknownStatusTestStepCount;
     }
 
     public Set<String> getTags() {

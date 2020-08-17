@@ -42,9 +42,14 @@ public abstract class HygieiaMongoEventListener<T> extends AbstractMongoEventLis
      * @return
      */
     protected CollectorItem getTeamDashboardCollectorItem(Dashboard teamDashboard) {
-        ObjectId productCollectorId = getProductCollector().getId();
-        ObjectId dashboardId = teamDashboard.getId();
-        return collectorItemRepository.findTeamDashboardCollectorItemsByCollectorIdAndDashboardId(productCollectorId, dashboardId.toString());
+        Collector productColl = getProductCollector();
+        if (productColl == null) {
+            return null;
+        } else {
+            ObjectId productCollectorId = productColl.getId();
+            ObjectId dashboardId = teamDashboard.getId();
+            return collectorItemRepository.findTeamDashboardCollectorItemsByCollectorIdAndDashboardId(productCollectorId, dashboardId.toString());
+        }
     }
 
     /**

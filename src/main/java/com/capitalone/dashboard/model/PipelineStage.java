@@ -59,8 +59,9 @@ public final class PipelineStage {
 		if (name == null) {
 			if (other.name != null)
 				return false;
-		} else if (!name.equalsIgnoreCase(other.name))
+		} else if (!name.equalsIgnoreCase(other.name)) {
 			return false;
+		}
         return type == other.type;
     }
 	

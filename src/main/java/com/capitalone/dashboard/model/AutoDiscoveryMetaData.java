@@ -98,5 +98,4 @@ public class AutoDiscoveryMetaData {
 
     public void setOwners(List<Owner> owners) { this.owners = owners; }
 
-    public AutoDiscoveryMetaData(){ }
 }

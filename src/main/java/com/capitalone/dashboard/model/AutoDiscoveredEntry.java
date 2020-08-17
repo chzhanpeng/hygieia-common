@@ -119,9 +119,9 @@ public class AutoDiscoveredEntry {
             collectorItem.setDescription(description);
             collectorItem.setNiceName(niceName);
             collectorItem.setCollectorId(collector.getId());
-            for (String key : options.keySet()) {
-                if (collector.getAllFields().keySet().contains(key)) {
-                    collectorItem.getOptions().put(key, options.get(key));
+            for (Map.Entry<String, Object> entry : options.entrySet()) {
+                if (collector.getAllFields().containsKey(entry.getKey())) {
+                    collectorItem.getOptions().put(entry.getKey(), entry.getValue());
                 }
             }
             collectorItem.setAutoDiscoverStatus(status);

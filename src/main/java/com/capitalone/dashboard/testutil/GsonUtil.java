@@ -30,5 +30,7 @@ public class GsonUtil {
     public static Gson getGson() {
         return GSON_BUILDER.create();
     }
+
+    private GsonUtil() {}
 }
 

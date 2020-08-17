@@ -169,7 +169,7 @@ public class Incident extends BaseModel {
     @Override
     public String toString() {
 
-        StringBuffer buf = new StringBuffer(210);
+        StringBuilder buf = new StringBuilder(210);
         buf.append("incidentID: ")
                 .append(incidentID);
 
