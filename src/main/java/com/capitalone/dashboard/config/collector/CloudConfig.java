@@ -26,9 +26,6 @@ public class CloudConfig extends CollectorItem {
     private static final int NETWORK_IO_ERROR_THRESHOLD_DEFAULT = 80;
     private static final int NETWORK_IO_ALERT_THRESHOLD_DEFAULT = 50;
 
-//    private static final int SUBNET_IP_ERROR_THRESHOLD_DEFAULT = 80;
-//    private static final int SUBNET_IP_ALERT_THRESHOLD_DEFAULT = 50;
-
     private static final String AGE_ERROR = "ageError";
     private static final String AGE_ALERT = "ageAlert";
     private static final String CPU_ERROR = "cpuError";

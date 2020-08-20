@@ -126,7 +126,7 @@ public class RepoBranch {
         String host;
         String path;
         try {
-            URI processedURI = URI.create(url.replaceAll(" ", "%20"));
+            URI processedURI = URI.create(url.replace(" ", "%20"));
             host = processedURI.getHost();
             path = processedURI.getPath();
         } catch (IllegalArgumentException e) {

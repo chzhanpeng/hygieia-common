@@ -123,7 +123,7 @@ public abstract class CollectorTask<T extends Collector> implements Runnable {
             if (timeElapsed <= requestRateLimitTimeWindow) {
                 long timeToWait = (timeElapsed < requestRateLimitTimeWindow)? ((requestRateLimitTimeWindow - timeElapsed) + waitTime) : waitTime;
 
-                LOGGER.debug("Rates limit exceeded: timeElapsed = " +timeElapsed+ "; Rate Count = "+requestCount+ "; waiting for " + timeToWait + " milliseconds");
+                LOGGER.debug("Rates limit exceeded: timeElapsed = {}; Rate Count = {}; waiting for {} milliseconds", timeElapsed, requestCount, timeToWait);
                 sleep (timeToWait);
             }
         }
@@ -153,7 +153,7 @@ public abstract class CollectorTask<T extends Collector> implements Runnable {
             token2 = Strings.padStart(" " + count.toString(), 25 - text.length(), ' ');
             token3 = Strings.padStart(" " + elapsed, 10, ' ');
         }
-        LOGGER.info(text + token2 + token3);
+        LOGGER.info("{} {} {} ", text, token2, token3);
     }
     protected void log(String message) {
         LOGGER.info(message);

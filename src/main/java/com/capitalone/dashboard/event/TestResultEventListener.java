@@ -56,31 +56,44 @@ public class TestResultEventListener extends AbstractMongoEventListener<TestResu
     private static long SEVERITY_CRITICAL = 2;
     private static long SEVERITY_GOOD = 0;
 
-    private static double targetRespTime;
-    private static double actualRespTime;
-    private static double targetTxnsPerSec;
-    private static double actualTxnsPerSec;
-    private static double actualErrorRate;
-    private static double targetErrorRate;
-    private static double actualErrorsVal;
-    private static double txnHealthPercentVal;
-    private static long errRateSeverityVal;
-    private static long respTimeSeverityVal;
-    private static boolean isResponseTimeGood = false;
-    private static boolean isTxnGoodHealth = false;
-    private static boolean isErrorRateGood = false;
+    private double targetRespTime;
+    private double actualRespTime;
+    private double targetTxnsPerSec;
+    private double actualTxnsPerSec;
+    private double actualErrorRate;
+    private double targetErrorRate;
+    private double actualErrorsVal;
+    private double txnHealthPercentVal;
+    private long errRateSeverityVal;
+    private long respTimeSeverityVal;
+    private boolean isResponseTimeGood = false;
+    private boolean isTxnGoodHealth = false;
+    private boolean isErrorRateGood = false;
 
     private final PerformanceRepository performanceRepository;
     private final CollectorRepository collectorRepository;
     private final CollectorItemRepository collectorItemRepository;
 
     private enum PERFORMANCE_METRICS {
-        averageResponseTime,totalCalls,errorsperMinute,actualErrorRate,businessTransactionHealthPercent,nodeHealthPercent,violationObject,
-        totalErrors,errorRateSeverity,responseTimeSeverity,callsperMinute,targetResponseTime,targetTransactionPerSec,
-        targetErrorRateThreshold
+        AVERAGE_RESPONSE_TIME,
+        TOTAL_CALLS,
+        ERRORS_PER_MIN,
+        ACTUAL_ERROR_RATE,
+        BUSINESS_TRANSACTION_HEALTH_PERCENT,
+        NODE_HEALTH_PERCENT,
+        VIOLATION_OBJECT,
+        TOTAL_ERRORS,
+        ERROR_RATE_SEVERITY,
+        RESPONSE_TIME_SEVERITY,
+        CALLS_PER_MIN,
+        TARGET_RESPONSE_TIME,
+        TARGET_TRANSACTION_PER_SEC,
+        TARGET_ERROR_RATE_THRESHOLD
     }
+
     private enum VIOLATION_ATTRIBUTES {
-        severity,incidentStatus
+        SEVERITY,
+        INCIDENT_STATUS
     }
 
     @Autowired
@@ -108,7 +121,7 @@ public class TestResultEventListener extends AbstractMongoEventListener<TestResu
 
         List<TestCapability> testCapabilities = new ArrayList<>(testResult.getTestCapabilities());
         if (CollectionUtils.isEmpty(testCapabilities)){
-            LOGGER.info("No Test Capabilities found for the test result : " + testResult.getId());
+            LOGGER.info("No Test Capabilities found for the test result : {}", testResult.getId());
             return;
         }
         testCapabilities.sort(Comparator.comparing(TestCapability::getTimestamp).reversed());
@@ -198,7 +211,7 @@ public class TestResultEventListener extends AbstractMongoEventListener<TestResu
         Optional<Map<String, Object>> optOptions = Optional.ofNullable(testResultCollItem.getOptions());
         Optional<Object> optJobName = Optional.ofNullable(optOptions.get().get(KEY_JOB_NAME));
         String jobName = optJobName.isPresent() ? optJobName.get().toString() : "";
-        LOGGER.info("Posted Test Result Description(niceName : jobName) - " + niceName + " : " + jobName);
+        LOGGER.info("Posted Test Result Description(niceName : jobName) - {} : {}", niceName, jobName);
         Collector perfToolsCollector = getPerfToolsCollector();
         Optional<CollectorItem> optCollectorItem = Optional.ofNullable(collectorItemRepository.findByCollectorIdNiceNameAndJobName(
                 perfToolsCollector.getId(), niceName, jobName));
@@ -255,21 +268,21 @@ public class TestResultEventListener extends AbstractMongoEventListener<TestResu
         respTimeSeverityVal = isResponseTimeGood ? SEVERITY_GOOD : SEVERITY_CRITICAL;
         errRateSeverityVal = isErrorRateGood ? SEVERITY_GOOD : SEVERITY_CRITICAL;
 
-        metrics.put(PERFORMANCE_METRICS.averageResponseTime.name(), Math.round(actualRespTime));
-        metrics.put(PERFORMANCE_METRICS.callsperMinute.name(), Math.round(callsPerMinuteVal));
-        metrics.put(PERFORMANCE_METRICS.errorsperMinute.name(), Math.round(errorsPerMinuteVal));
-        metrics.put(PERFORMANCE_METRICS.actualErrorRate.name(), actualErrorRate);
-        metrics.put(PERFORMANCE_METRICS.totalCalls.name(), Math.round(totalCallsVal));
-        metrics.put(PERFORMANCE_METRICS.totalErrors.name(), Math.round(actualErrorsVal));
-        metrics.put(PERFORMANCE_METRICS.businessTransactionHealthPercent.name(), txnHealthPercentVal);
-        metrics.put(PERFORMANCE_METRICS.nodeHealthPercent.name(), HEALTH_GOOD);
-        metrics.put(PERFORMANCE_METRICS.errorRateSeverity.name(), errRateSeverityVal);
-        metrics.put(PERFORMANCE_METRICS.responseTimeSeverity.name(), respTimeSeverityVal);
-        metrics.put(PERFORMANCE_METRICS.violationObject.name(), getPerfTestViolation());
+        metrics.put(PERFORMANCE_METRICS.AVERAGE_RESPONSE_TIME.name(), Math.round(actualRespTime));
+        metrics.put(PERFORMANCE_METRICS.CALLS_PER_MIN.name(), Math.round(callsPerMinuteVal));
+        metrics.put(PERFORMANCE_METRICS.ERRORS_PER_MIN.name(), Math.round(errorsPerMinuteVal));
+        metrics.put(PERFORMANCE_METRICS.ACTUAL_ERROR_RATE.name(), actualErrorRate);
+        metrics.put(PERFORMANCE_METRICS.TOTAL_CALLS.name(), Math.round(totalCallsVal));
+        metrics.put(PERFORMANCE_METRICS.TOTAL_ERRORS.name(), Math.round(actualErrorsVal));
+        metrics.put(PERFORMANCE_METRICS.BUSINESS_TRANSACTION_HEALTH_PERCENT.name(), txnHealthPercentVal);
+        metrics.put(PERFORMANCE_METRICS.NODE_HEALTH_PERCENT.name(), HEALTH_GOOD);
+        metrics.put(PERFORMANCE_METRICS.ERROR_RATE_SEVERITY.name(), errRateSeverityVal);
+        metrics.put(PERFORMANCE_METRICS.RESPONSE_TIME_SEVERITY.name(), respTimeSeverityVal);
+        metrics.put(PERFORMANCE_METRICS.VIOLATION_OBJECT.name(), getPerfTestViolation());
 
-        metrics.put(PERFORMANCE_METRICS.targetResponseTime.name(), targetRespTime);
-        metrics.put(PERFORMANCE_METRICS.targetTransactionPerSec.name(), targetTxnsPerSec);
-        metrics.put(PERFORMANCE_METRICS.targetErrorRateThreshold.name(), targetErrorRate);
+        metrics.put(PERFORMANCE_METRICS.TARGET_RESPONSE_TIME.name(), targetRespTime);
+        metrics.put(PERFORMANCE_METRICS.TARGET_TRANSACTION_PER_SEC.name(), targetTxnsPerSec);
+        metrics.put(PERFORMANCE_METRICS.TARGET_ERROR_RATE_THRESHOLD.name(), targetErrorRate);
         return metrics;
     }
 
@@ -280,8 +293,8 @@ public class TestResultEventListener extends AbstractMongoEventListener<TestResu
         List<LinkedHashMap<Object, Object>> violationObjList = new ArrayList<>();
         LinkedHashMap<Object, Object> violationObjMap = new LinkedHashMap<>();
         if (!(isResponseTimeGood && isTxnGoodHealth && isErrorRateGood)){
-            violationObjMap.put(VIOLATION_ATTRIBUTES.severity, STR_CRITICAL);
-            violationObjMap.put(VIOLATION_ATTRIBUTES.incidentStatus, STR_OPEN);
+            violationObjMap.put(VIOLATION_ATTRIBUTES.SEVERITY, STR_CRITICAL);
+            violationObjMap.put(VIOLATION_ATTRIBUTES.INCIDENT_STATUS, STR_OPEN);
         }
         if(!violationObjMap.isEmpty()) {
             violationObjList.add(violationObjMap);

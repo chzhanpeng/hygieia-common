@@ -82,23 +82,27 @@ public class ArtifactIdentifier {
 		if (classifier == null) {
 			if (other.classifier != null)
 				return false;
-		} else if (!classifier.equals(other.classifier))
+		} else if (!classifier.equals(other.classifier)) {
 			return false;
+		}
 		if (extension == null) {
 			if (other.extension != null)
 				return false;
-		} else if (!extension.equals(other.extension))
+		} else if (!extension.equals(other.extension)) {
 			return false;
+		}
 		if (group == null) {
 			if (other.group != null)
 				return false;
-		} else if (!group.equals(other.group))
+		} else if (!group.equals(other.group)) {
 			return false;
+		}
 		if (name == null) {
 			if (other.name != null)
 				return false;
-		} else if (!name.equals(other.name))
+		} else if (!name.equals(other.name)) {
 			return false;
+		}
 		if (version == null) {
             return other.version == null;
 		} else return version.equals(other.version);

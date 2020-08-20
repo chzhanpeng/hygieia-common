@@ -24,6 +24,14 @@ import java.util.Set;
 
 public final class PipelineUtils {
 
+    private static final String BUILD = "Build";
+    private static final String REPO = "repo";
+    private static final String COMMIT = "Commit";
+    private static final String PIPELINE = "pipeline";
+    private static final String MAPPINGS = "mappings";
+    private static final String ORDER = "order";
+    private static final String PROD = "prod";
+
     private PipelineUtils(){
 
     }
@@ -40,13 +48,14 @@ public final class PipelineUtils {
         Map<PipelineStage, String> rt = new LinkedHashMap<>();
 
         for(Widget widget : dashboard.getWidgets()) {
-            if(widget.getName().equalsIgnoreCase("build")){
-                rt.put(PipelineStage.valueOf("Build"), "Build");
-            }if(widget.getName().equalsIgnoreCase("repo")){
-                rt.put(PipelineStage.valueOf("Commit"), "Commit");
+            if(widget.getName().equalsIgnoreCase(BUILD)){
+                rt.put(PipelineStage.valueOf(BUILD), BUILD);
             }
-            if (widget.getName().equalsIgnoreCase("pipeline")) {
-                Map<?,?> gh = (Map<?,?>) widget.getOptions().get("mappings");
+            if(widget.getName().equalsIgnoreCase(REPO)){
+                rt.put(PipelineStage.valueOf(COMMIT), COMMIT);
+            }
+            if (widget.getName().equalsIgnoreCase(PIPELINE)) {
+                Map<?,?> gh = (Map<?,?>) widget.getOptions().get(MAPPINGS);
                 if(gh == null) {
                     throw new HygieiaException("Pipeline " + widget.getId() + " is missing mappings ", HygieiaException.BAD_DATA);
                 }
@@ -63,11 +72,11 @@ public final class PipelineUtils {
 
     public static Map<String, String> getOrderForStages(Dashboard dashboard) {
         Map<String, String> rt = new LinkedHashMap<>();
-        rt.put("0", "Commit");
-        rt.put("1", "Build");
+        rt.put("0", COMMIT);
+        rt.put("1", BUILD);
         for(Widget widget : dashboard.getWidgets()) {
-            if (widget.getName().equalsIgnoreCase("pipeline")) {
-                Map<?,?> gh = (Map<?,?>) widget.getOptions().get("order");
+            if (widget.getName().equalsIgnoreCase(PIPELINE)) {
+                Map<?,?> gh = (Map<?,?>) widget.getOptions().get(ORDER);
                 int count = 2;
                 if(gh!=null) {
                     for (Map.Entry<?, ?> entry : gh.entrySet()) {
@@ -84,8 +93,8 @@ public final class PipelineUtils {
     public static String getProdStage(Dashboard dashboard) {
         String prodStage = "";
         for(Widget widget : dashboard.getWidgets()) {
-            if (widget.getName().equalsIgnoreCase("pipeline")) {
-                prodStage =  (String)widget.getOptions().get("prod");
+            if (widget.getName().equalsIgnoreCase(PIPELINE)) {
+                prodStage =  (String)widget.getOptions().get(PROD);
             }
         }
         return prodStage;
@@ -103,9 +112,9 @@ public final class PipelineUtils {
         }
 
         for(Widget widget : dashboard.getWidgets()) {
-            if (widget.getName().equalsIgnoreCase("pipeline")) {
+            if (widget.getName().equalsIgnoreCase(PIPELINE)) {
 
-                widget.getOptions().put("mappings", mappingsMap);
+                widget.getOptions().put(MAPPINGS, mappingsMap);
             }
         }
     }

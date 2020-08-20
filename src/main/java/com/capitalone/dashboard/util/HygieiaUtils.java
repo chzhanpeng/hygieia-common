@@ -165,4 +165,6 @@ public class HygieiaUtils {
 		return BooleanUtils.toBoolean(featureFlag.getFlags().get(StringUtils.lowerCase(collectorType.toString())));
 	}
 
+	private HygieiaUtils() {}
+
 }

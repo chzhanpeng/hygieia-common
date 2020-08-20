@@ -8,6 +8,7 @@ import com.capitalone.dashboard.model.TestSuiteType;
 import com.capitalone.dashboard.model.quality.JunitXmlReport;
 import org.apache.commons.lang3.StringUtils;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -73,6 +74,7 @@ public class JunitXmlToTestCapabilityTransformer {
 
     private TestCase parseScenarioAsTestCase(JunitXmlReport.Testcase scenarioElement) {
         TestCase testCase = new TestCase();
+        BigDecimal zero = new BigDecimal(0);
         testCase.setDescription( scenarioElement.getName());
         // Parse each step as a TestCase
         int testStepSuccessCount = 0, testStepFailCount = 0, testStepSkippedCount = 0, testStepUnknownCount = 0;
@@ -81,7 +83,7 @@ public class JunitXmlToTestCapabilityTransformer {
               testDuration += scenarioElement.getTime().longValue();
         if(scenarioElement.getError() != null){
             testStepFailCount++;
-        }else if (StringUtils.isNotBlank(scenarioElement.getSkipped()) && "0".equals(scenarioElement.getTime())){
+        }else if (StringUtils.isNotBlank(scenarioElement.getSkipped()) && zero.equals(scenarioElement.getTime())){
             testStepSkippedCount++;
         }else if(scenarioElement.getTime().doubleValue() > 0){
             testStepSuccessCount++;
@@ -93,7 +95,7 @@ public class JunitXmlToTestCapabilityTransformer {
         testCase.setSuccessTestStepCount(testStepSuccessCount);
         testCase.setSkippedTestStepCount(testStepSkippedCount);
         testCase.setFailedTestStepCount(testStepFailCount);
-        testCase.setUnknownStatusCount(testStepUnknownCount);
+        testCase.setUnknownStatusTestStepCount(testStepUnknownCount);
         testCase.setTotalTestStepCount(testCase.getTestSteps().size());
         // Set Status
         if (testStepFailCount > 0) {

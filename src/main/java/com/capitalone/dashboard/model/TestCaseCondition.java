@@ -18,9 +18,9 @@ public class TestCaseCondition {
     }
 
     public void setResult(TestCaseStatus status, long duration) {
-        TestCaseConditionResult result = new TestCaseConditionResult();
-        result.setDuration(duration);
-        result.setStatus(status);
-        this.result = result;
+        TestCaseConditionResult r = new TestCaseConditionResult();
+        r.setDuration(duration);
+        r.setStatus(status);
+        this.result = r;
     }
 }

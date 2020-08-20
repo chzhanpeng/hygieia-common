@@ -331,13 +331,9 @@ public class BinaryArtifact extends BaseModel {
         this.buildInfos = buildInfos;
     }
 
-
-    public static final Comparator<BinaryArtifact> TIMESTAMP_COMPARATOR = new Comparator<BinaryArtifact>() {
-        @Override
-        public int compare(BinaryArtifact o1, BinaryArtifact o2) {
-            return Long.compare(o1.getTimestamp(), o2.getTimestamp());
-        }
-    };
+    public static final Comparator<BinaryArtifact> TIMESTAMP_COMPARATOR = (
+            BinaryArtifact o1, BinaryArtifact o2
+            ) -> Long.compare(o1.getTimestamp(), o2.getTimestamp());
 
     @Override
     public boolean equals(Object obj) {
