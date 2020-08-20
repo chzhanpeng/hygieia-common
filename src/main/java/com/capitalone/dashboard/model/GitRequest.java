@@ -40,6 +40,7 @@ public class GitRequest  {
     private String state;
     private long mergedAt;
     private String mergeAuthor;
+    private String mergeAuthorType;
     private String mergeAuthorLDAPDN;
     private long timestamp;
     private long resolutiontime;
@@ -335,6 +336,10 @@ public class GitRequest  {
     public void setMergeAuthor(String mergeAuthor) {
         this.mergeAuthor = mergeAuthor;
     }
+
+    public String getMergeAuthorType() { return mergeAuthorType; }
+
+    public void setMergeAuthorType(String mergeAuthorType) { this.mergeAuthorType = mergeAuthorType; }
 
     public String getMergeAuthorLDAPDN() {
         return mergeAuthorLDAPDN;

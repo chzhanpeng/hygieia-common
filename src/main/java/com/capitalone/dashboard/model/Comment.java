@@ -2,6 +2,7 @@ package com.capitalone.dashboard.model;
 
 public class Comment {
     private String user;
+    private String userType;
     private String userLDAPDN;
     private long createdAt;
     private long updatedAt;
@@ -12,13 +13,13 @@ public class Comment {
         return user;
     }
 
-    public void setUser(String user) {
-        this.user = user;
-    }
+    public void setUser(String user) { this.user = user; }
 
-    public String getUserLDAPDN() {
-        return userLDAPDN;
-    }
+    public String getUserType() { return userType; }
+
+    public void setUserType(String userType) { this.userType = userType; }
+
+    public String getUserLDAPDN() { return userLDAPDN; }
 
     public void setUserLDAPDN(String userLDAPDN) {
         this.userLDAPDN = userLDAPDN;

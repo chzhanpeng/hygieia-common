@@ -26,6 +26,9 @@ public class LibraryPolicyResult extends BaseModel {
     private List<PolicyScanMetric> policyAlert = new ArrayList<>();
     private ObjectId buildId;
     private String scanState;
+    private String projectName;
+    private String productName;
+    private String buildUrl;
 
     public static class Threat {
         LibraryPolicyThreatLevel level;
@@ -273,5 +276,27 @@ public class LibraryPolicyResult extends BaseModel {
 
     public String getScanState() { return this.scanState; }
 
+    public String getProjectName() {
+        return projectName;
+    }
 
+    public void setProjectName(String projectName) {
+        this.projectName = projectName;
+    }
+
+    public String getProductName() {
+        return productName;
+    }
+
+    public void setProductName(String productName) {
+        this.productName = productName;
+    }
+
+    public String getBuildUrl() {
+        return buildUrl;
+    }
+
+    public void setBuildUrl(String buildUrl) {
+        this.buildUrl = buildUrl;
+    }
 }
