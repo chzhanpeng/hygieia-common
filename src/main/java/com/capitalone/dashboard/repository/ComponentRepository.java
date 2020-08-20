@@ -66,4 +66,8 @@ public interface ComponentRepository extends QueryRepository<Component> {
         return findAll("collectorItems." + collectorType + ".id eq " + quote(collectorItemId.toHexString()));
     }
 
+    default List<Component> findByArtifactCollectorItems(ObjectId artifactCollectorItemId) {
+        return findAll("collectorItems.Artifact._id eq" + quote(artifactCollectorItemId.toHexString()));
+    }
+
 }

@@ -2,7 +2,9 @@ package com.capitalone.dashboard.repository;
 
 import com.capitalone.dashboard.model.BinaryArtifact;
 import org.bson.types.ObjectId;
+import org.springframework.data.domain.Sort;
 
+import java.util.List;
 import java.util.Map;
 
 public interface BinaryArtifactRepository extends QueryRepository<BinaryArtifact> {
@@ -56,4 +58,13 @@ public interface BinaryArtifactRepository extends QueryRepository<BinaryArtifact
         }
         return findAll(query);
     }
+	
+	BinaryArtifact findBinaryArtifactByCollectorItemIdAndArtifactVersion(ObjectId collectorItemId, String artifactVersion);
+	BinaryArtifact findTopByCollectorItemIdAndBuildInfosIsNotEmptyOrderByTimestampDesc(ObjectId collectorItemId, Sort sort);
+	BinaryArtifact findTopByCollectorItemIdAndArtifactVersionOrderByTimestampDesc(ObjectId collectorItemId, String artifactVersion);
+    Iterable<BinaryArtifact> findByArtifactNameAndArtifactVersionAndCreatedTimeStamp(String artifactName, String artifactVersion,Long timestamp);
+    Iterable<BinaryArtifact> findByArtifactNameAndArtifactVersion(String artifactName, String artifactVersion);
+    List<BinaryArtifact> findByCollectorItemIdAndTimestampIsBetweenOrderByTimestampDesc(ObjectId collectorItemId, long beginDate, long endDate);
+    BinaryArtifact findTopByCollectorItemIdOrderByTimestampDesc(ObjectId collectorItemId);
+
 }

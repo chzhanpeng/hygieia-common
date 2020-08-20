@@ -32,7 +32,11 @@ public enum CollectorType {
     Audit,
     Log,
     AutoDiscover,
-    InfrastructureAsCode;
+    InfrastructureAsCode,
+    Docker,
+    Api,
+    ApiAudit,
+    Helm;
 
     public static CollectorType fromString(String value) {
         for (CollectorType collectorType : values()) {
