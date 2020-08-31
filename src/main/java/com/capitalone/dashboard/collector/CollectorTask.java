@@ -45,7 +45,7 @@ public abstract class CollectorTask<T extends Collector> implements Runnable {
 
     @Override
     public final void run() {
-        LOGGER.info("Running Collector: {}", collectorName);
+        LOGGER.info("Getting Collector: {}", collectorName);
         T collector = getCollectorRepository().findByName(collectorName);
         if (collector == null) {
             // Register new collector
@@ -64,15 +64,23 @@ public abstract class CollectorTask<T extends Collector> implements Runnable {
 
         if (collector.isEnabled()) {
             // Do collection run
+			LOGGER.info("Starting Collector={}", collectorName);
+            long start = System.currentTimeMillis();
             if(CollectionUtils.isEmpty(getSelectedCollectorItems())) {
                 collect(collector);
             } else {
                 collect(collector, getSelectedCollectorItems());
             }
+			long count = collector.getLastExecutionRecordCount();
+            long end = System.currentTimeMillis();
+            long duration = end - start;
+            LOGGER.info("Finished running Collector={} timeTaken=" + duration + " collectorItems=" + count, collectorName);
 
             // Update lastUpdate timestamp in Collector
             collector.setLastExecuted(System.currentTimeMillis());
             getCollectorRepository().save(collector);
+        } else {
+            LOGGER.info("Collector is disabled, collectorName={}", collectorName);
         }
     }
 
@@ -123,7 +131,7 @@ public abstract class CollectorTask<T extends Collector> implements Runnable {
             if (timeElapsed <= requestRateLimitTimeWindow) {
                 long timeToWait = (timeElapsed < requestRateLimitTimeWindow)? ((requestRateLimitTimeWindow - timeElapsed) + waitTime) : waitTime;
 
-                LOGGER.debug("Rates limit exceeded: timeElapsed = {}; Rate Count = {}; waiting for {} milliseconds", timeElapsed, requestCount, timeToWait);
+                LOGGER.debug("Rates limit exceeded: timeElapsed = " +timeElapsed+ "; Rate Count = "+requestCount+ "; waiting for " + timeToWait + " milliseconds");
                 sleep (timeToWait);
             }
         }
@@ -153,12 +161,13 @@ public abstract class CollectorTask<T extends Collector> implements Runnable {
             token2 = Strings.padStart(" " + count.toString(), 25 - text.length(), ' ');
             token3 = Strings.padStart(" " + elapsed, 10, ' ');
         }
-        LOGGER.info("{} {} {} ", text, token2, token3);
+        LOGGER.info(text + token2 + token3);
     }
     protected void log(String message) {
         LOGGER.info(message);
     }
 
+    @Deprecated
     protected void logBanner(String instanceUrl) {
         LOGGER.info("-----------------------------------");
         LOGGER.info(instanceUrl);
