@@ -130,6 +130,10 @@ public interface CollectorItemRepository extends BaseCollectorItemRepository<Col
         return gitHubParsedUrl.getUrl();
     }
 
+    default CollectorItem findByOrgNameAndProjectNameAndProjectToken(String orgName, String projectName, String projectToken) {
+        return findOne("options.orgName eq " + quote(orgName) + " and options.projectName eq " + quote(projectName) + " and options.projectToken eq" + quote(projectToken) );
+    }
+
     default String getQuery(Map<String, Object> options, Map.Entry<String, Object> e) {
         if ("url".equalsIgnoreCase(e.getKey())) {
             String url = getGitHubParsedString(options, e);
