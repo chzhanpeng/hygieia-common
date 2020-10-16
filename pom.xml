@@ -35,7 +35,7 @@
         <pmd.version>3.6</pmd.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <junit.version>4.12</junit.version>
-        <spring.version>5.2.7.RELEASE</spring.version>
+        <spring.version>5.2.9.RELEASE</spring.version>
         <spring.webmvc.version>5.2.7.RELEASE</spring.webmvc.version>
         <spring.websecurity.version>4.2.15.RELEASE</spring.websecurity.version>
         <spring.cloud.version>2.2.1.RELEASE</spring.cloud.version>
